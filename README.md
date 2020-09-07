@@ -1,2 +1,2 @@
-# sanvaad-ui
+# sanvaad
 Video Chat Application
