@@ -1,0 +1,35 @@
+<div class="container-fluid h-100">
+  <div class="row h-100">
+    <div class="col-sm-6 col-2 h-100  py-2 d-flex align-items-center justify-content-center fixed-top" id="left">
+
+
+      <div style="margin: 10px;">
+        <button mat-raised-button color="primary" (click)="createRoomId()">
+          <mat-icon>video_call</mat-icon>
+          Create Room
+        </button>
+      </div>
+
+      <b>OR</b>
+
+      <div [formGroup]="joinRoomForm" style="margin-left: 10px;">
+        <mat-form-field>
+          <input matInput formControlName="joinInput" placeholder="Meeting Id">
+        </mat-form-field>
+      </div>
+
+      <div mat-dialog-actions style="margin-left: 10px;">
+        <button mat-raised-button color="primary" (click)="setUserName()"
+          [disabled]="joinInput.hasError('required') ? true : false" cdkFocusInitial>Join</button>
+      </div>
+
+
+    </div>
+    <div class="col-sm-6 invisible col-2">
+      <!--hidden spacer-->
+    </div>
+    <div class="col offset-2 offset-sm-6 py-2 align-items-center justify-content-center">
+      <img src="assets/images/sanvaad.png" style="margin-top: 50px; margin-left: 30px;" />
+    </div>
+  </div>
+</div>

@@ -1,0 +1,13 @@
+<h1 mat-dialog-title>Set your display name</h1>
+<div mat-dialog-content [formGroup]="setUserNameForm">
+  <mat-form-field>
+    <mat-label>DisplayName</mat-label>
+    <input matInput formControlName="displayNameInput">
+    <mat-error *ngIf="displayNameInput.hasError('required')">
+      Display Name is <strong>required</strong>
+    </mat-error>
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-raised-button color="primary" (click)="setUserName()" cdkFocusInitial>Set</button>
+</div>

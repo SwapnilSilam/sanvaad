@@ -1,0 +1,46 @@
+<mat-drawer-container hasBackdrop="false" style="height: 100vh;">
+  <mat-drawer #drawer mode="over" position="end" style="width: 450px; min-height: 625px; max-width: 100vh;">
+    <div style="padding: 2px 2px 2px 2px">
+      <app-chat-window></app-chat-window>
+    </div>
+  </mat-drawer>
+  <mat-drawer-content>
+    <form style="height: 100%;">
+      <div id="video-container" #videoContainer>
+      </div>
+      <div id="errorMsg"></div>
+    </form>
+  </mat-drawer-content>
+</mat-drawer-container>
+<div class="controlPanel" id="video-controls-container">
+  <div class="meetingDetails">
+    <button class="video-control" mat-raised-button color="primary" matTooltip="Meeting details" (click)="openMeetingDetailsDialog($event)">
+      Meeting Details
+    </button>
+    <button class="video-control" mat-raised-button color="primary" matTooltip="List of Participants" (click)="openGetPaticipantListDialog($event)">
+      Participants
+    </button>
+  </div>
+  <div class="meetingControls">
+    <button class="video-control" mat-raised-button color="primary" id="videoOnButton"
+      [matTooltip]="isVideoEnabled ? 'Video Off' : 'Video On'" (click)="PlayStopVideo()">
+      <mat-icon>{{isVideoEnabled ? 'videocam' : 'videocam_off'}}</mat-icon>
+    </button>
+    <button class="video-control" mat-raised-button color="primary" id="muteUnmuteButton"
+      [matTooltip]="isMute ? 'Mute' : 'Unmute'" (click)="muteUnmute()">
+      <mat-icon>{{isMute ? 'mic_none' : 'mic_off'}}</mat-icon>
+    </button>
+    <button class="video-control" mat-raised-button color="warn" id="endCallButton" matTooltip="Leave a call"
+      (click)="EndCall()">
+      <mat-icon>call_end</mat-icon>
+    </button>
+    <button class="video-control" mat-raised-button (click)="drawer.toggle()" matTooltip="Chat" color="primary">
+      <mat-icon>chat</mat-icon>
+    </button>
+  </div>
+  <div class="screenSharingControls">
+    <button class="video-control" mat-raised-button color="primary" matTooltip="Screen sharing">
+      Screen Sharing
+    </button>
+  </div>
+</div>

@@ -1,0 +1,93 @@
+video
+  -webkit-transform: scaleX(-1)
+  transform: scaleX(-1)
+  object-fit: cover
+  padding: 8px
+
+#video-container
+  float: left
+  overflow-x: scroll
+  overflow-y: scroll
+  flex-direction: row
+  margin: 0
+  padding: 0
+  width: 100vw
+  height: 100vh
+  display: flex
+  justify-content: center
+  align-items: center
+
+.displayNameContainer
+  display: flex
+  flex-direction: column-reverse
+  font-weight: bold
+
+.displayName
+  padding: 0px 8px 0px 8px
+
+.video-control
+  margin: 5px
+
+#chat
+  padding: 5px
+  background-color: red
+  max-height: 150px
+  max-width: 50%
+  display: flex
+  flex-direction: column
+
+.mat-drawer-inner-container
+  width: 100%
+  height: 100%
+  overflow: auto
+  padding: 10px
+  -webkit-overflow-scrolling: touch
+
+.controlPanel
+  box-shadow: 0 1px 2px 0 rgba(60,64,67,0.302), 0 1px 3px 1px rgba(60,64,67,0.149)
+  -webkit-box-align: center
+  box-align: center
+  align-items: center
+  background-color: #fff
+  bottom: 0
+  box-sizing: border-box
+  display: flex
+  margin-bottom: 0
+  opacity: .96
+  position: fixed
+  text-align: center
+  // transform: translateY(100px)
+  transition: opacity 250ms cubic-bezier(0.4,0.0,1,1),transform 250ms cubic-bezier(0.4,0.0,1,1)
+  white-space: nowrap
+  width: 100vw
+  z-index: 3
+
+.meetingDetails
+  box-pack: start
+  -webkit-box-pack: start
+  justify-content: flex-start
+  -webkit-box-align: center
+  box-align: center
+  align-items: center
+  display: flex
+  overflow: hidden
+  text-align: start
+  text-overflow: ellipsis
+  flex: 1
+
+.meetingControls
+  min-width: 250px
+  flex: 1
+  display: block
+
+.screenSharingControls
+  display: flex
+  box-pack: end
+  -webkit-box-pack: end
+  justify-content: flex-end
+  -webkit-box-align: center
+  box-align: center
+  align-items: center
+  text-align: end
+  flex: 1
+  display: block

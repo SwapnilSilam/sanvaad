@@ -1,0 +1,26 @@
+<ng-container
+[formGroup]="chatForm"
+>
+  <!-- Chat container-->
+  <div fxLayout="column" fxLayoutAlign="center center">
+
+    <!-- Header -->
+    <mat-toolbar color="primary">
+      <span>Chat</span>
+      <span style="flex: 1 1 auto;"></span>
+    </mat-toolbar>
+
+    <!-- Messages-->
+    <div id="message_container" fxLayout="column"
+      style="width: 100%; overflow-y: scroll; background-color: lightgray; box-shadow: inset 0px 0px 10px rgba(0,0,0,0.5); height: 430px;">
+      <ng-container *ngFor="let msg of messages; trackBy: trackByCreated; let i = index">
+        <app-chat-message [msg]="msg" [user]="user"></app-chat-message>
+      </ng-container>
+    </div>
+
+    <!-- Send form and other controls -->
+    <mat-form-field style="width: 100%;">
+      <textarea matInput placeholder="Message" formControlName="message" (keydown.enter)="submit()"></textarea>
+    </mat-form-field>
+  </div>
+</ng-container>

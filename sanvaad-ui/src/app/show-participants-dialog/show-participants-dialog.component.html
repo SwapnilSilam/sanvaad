@@ -1,0 +1,12 @@
+<h1 mat-dialog-title>Paticipants</h1>
+<div mat-dialog-content style="height: 265px;">
+  <mat-list>
+    <mat-list-item *ngFor="let user of users">
+      <mat-icon mat-list-icon>account_circle</mat-icon>
+      <div mat-line>{{user.displayName}}</div>
+    </mat-list-item>
+  </mat-list>
+</div>
+<div mat-dialog-actions>
+  <button mat-raised-button color="primary" (click)="setUserName()" cdkFocusInitial>Close</button>
+</div>
