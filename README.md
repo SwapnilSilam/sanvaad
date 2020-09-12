@@ -2,7 +2,7 @@
 Video Chat Application
 
 ## Discription 
-Project Sanvaad is a Video Chat application and made using WebRTC and SignalR. This video chat application made for Peer to Peer communication. <br><br> **Sanvaad means "Conversation", this word is taken from Sanskrit language.**
+Project Sanvaad is a Video Chat application and made using WebRTC and SignalR. This video chat application made for Peer to Peer communication. <br><br> **Sanvaad (संवाद) means "Conversation", this word is taken from Sanskrit language.**
 
 
 ## Application created using 
