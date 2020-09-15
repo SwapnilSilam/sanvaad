@@ -40,6 +40,11 @@ export class SignalHandlerService {
     }
   };
 
+  public stopConnection = () => {
+    this.isServiceStarted = false;
+    this.hubConnection.stop().then(() => { console.log("Connection Closed!") }).catch(error => console.log(error));
+  }
+
   public disConnection = () => {
     this.hubConnection.onclose(error => { console.log("Disconncted from call.") });
   }

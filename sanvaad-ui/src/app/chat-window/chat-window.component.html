@@ -1,6 +1,4 @@
-<ng-container
-[formGroup]="chatForm"
->
+<ng-container [formGroup]="chatForm">
   <!-- Chat container-->
   <div fxLayout="column" fxLayoutAlign="center center">
 
@@ -13,8 +11,8 @@
     <!-- Messages-->
     <div id="message_container" fxLayout="column"
       style="width: 100%; overflow-y: scroll; background-color: lightgray; box-shadow: inset 0px 0px 10px rgba(0,0,0,0.5); height: 430px;">
-      <ng-container *ngFor="let msg of messages; trackBy: trackByCreated; let i = index">
-        <app-chat-message [msg]="msg" [user]="user"></app-chat-message>
+      <ng-container *ngFor="let msg of messages;">
+        <app-chat-message [msg]="msg"></app-chat-message>
       </ng-container>
     </div>
 

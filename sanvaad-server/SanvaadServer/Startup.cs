@@ -22,13 +22,15 @@ namespace SanvaadServer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var allowedHosts = Configuration.GetSection("AllowedHosts").Get<string[]>();
+
             services.AddControllers();
 
             services.AddCors(options =>
                {
                    options.AddPolicy("SignalRPolicy", builder =>
                    {
-                       builder.WithOrigins("http://localhost:4200");
+                       builder.WithOrigins(allowedHosts);
                        builder.AllowAnyMethod();
                        builder.AllowAnyHeader();
                        builder.AllowCredentials();

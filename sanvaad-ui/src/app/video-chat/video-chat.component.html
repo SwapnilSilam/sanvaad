@@ -31,7 +31,7 @@
       <mat-icon>{{isMute ? 'mic_none' : 'mic_off'}}</mat-icon>
     </button>
     <button class="video-control" mat-raised-button color="warn" id="endCallButton" matTooltip="Leave a call"
-      (click)="EndCall()">
+      (click)="endCall()">
       <mat-icon>call_end</mat-icon>
     </button>
     <button class="video-control" mat-raised-button (click)="drawer.toggle()" matTooltip="Chat" color="primary">

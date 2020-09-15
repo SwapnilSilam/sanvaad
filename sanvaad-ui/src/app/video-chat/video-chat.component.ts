@@ -5,7 +5,7 @@
 // Or PS> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine
 
 import { Component, Renderer2, ElementRef, ViewChild, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from "@angular/material";
 
 import { SignalHandlerService } from '../services/signal-handler.service';
@@ -35,7 +35,7 @@ export class VideoChatComponent implements OnInit {
   public avContraints: any = { audio: true, video: { width: { exact: 640 }, height: { exact: 480 } } };
   private connections: Array<PeerConnections> = new Array();
   private remoteConnectionIds: Array<string> = new Array();
-  constructor(private renderer: Renderer2, private route: ActivatedRoute, private dialog: MatDialog, public signalRService: SignalHandlerService) { }
+  constructor(private renderer: Renderer2, private route: ActivatedRoute, private router: Router, private dialog: MatDialog, public signalRService: SignalHandlerService) { }
 
   @ViewChild('videoContainer', { static: false }) videoContainer: ElementRef;
 
@@ -61,7 +61,7 @@ export class VideoChatComponent implements OnInit {
     );
   }
 
-  openGetPaticipantListDialog(evt: MouseEvent){
+  openGetPaticipantListDialog(evt: MouseEvent) {
 
     const target = new ElementRef(evt.currentTarget);
 
@@ -69,13 +69,13 @@ export class VideoChatComponent implements OnInit {
 
     dialogConfig.disableClose = false;
     dialogConfig.autoFocus = true;
-    dialogConfig.data = { trigger: target, roomId : this.meetingId };
+    dialogConfig.data = { trigger: target, roomId: this.meetingId };
     dialogConfig.hasBackdrop = true;
 
     const dialogRef = this.dialog.open(ShowParticipantsDialogComponent, dialogConfig);
   }
 
-  openMeetingDetailsDialog(evt: MouseEvent){
+  openMeetingDetailsDialog(evt: MouseEvent) {
 
     const target = new ElementRef(evt.currentTarget);
 
@@ -83,7 +83,7 @@ export class VideoChatComponent implements OnInit {
 
     dialogConfig.disableClose = false;
     dialogConfig.autoFocus = true;
-    dialogConfig.data = { trigger: target, roomId : this.meetingId };
+    dialogConfig.data = { trigger: target, roomId: this.meetingId };
     dialogConfig.hasBackdrop = true;
 
     const dialogRef = this.dialog.open(MeetingDetailsDialogComponent, dialogConfig);
@@ -134,7 +134,7 @@ export class VideoChatComponent implements OnInit {
     if (this.remoteConnectionIds.indexOf(call.peer) == -1) {
       this.remoteConnectionIds.push(call.peer);
       this.signalRService.invokeGetRemoteUserDetails(call.peer);
-      this.addUser(stream, call.peer, call, "");
+      this.addUser(stream, call.peer, call, "", false);
     }
   }
 
@@ -148,7 +148,7 @@ export class VideoChatComponent implements OnInit {
   onReceiveRemoteUserStream(stream: any, userId: string, callObject: any, displayName: string) {
     if (this.remoteConnectionIds.indexOf(userId) == -1) {
       this.remoteConnectionIds.push(userId);
-      this.addUser(stream, userId, callObject, displayName);
+      this.addUser(stream, userId, callObject, displayName, false);
     }
   }
 
@@ -176,7 +176,7 @@ export class VideoChatComponent implements OnInit {
     const constraints = videoTracks[0].getConstraints();
 
     this.localUserStream = stream;
-    this.addUser(this.localUserStream, this.localUserId, null, this.userDisplayName);
+    this.addUser(this.localUserStream, this.localUserId, null, this.userDisplayName, true);
   }
 
   connectToOtherUsers(roomId: string, userId: string, displayName: string) {
@@ -217,9 +217,9 @@ export class VideoChatComponent implements OnInit {
     }
   }
 
-  addUser(stream: MediaStream, userId: string, callObject: any, userName: string) {
+  addUser(stream: MediaStream, userId: string, callObject: any, userName: string, isLocalPaticipant : boolean) {
     const videoElement = this.GetNewVideoElement();
-    videoElement.muted = true;
+    videoElement.muted = isLocalPaticipant;
     videoElement.srcObject = stream;
 
     this.isVideoEnabled = stream.getVideoTracks()[0].enabled;
@@ -248,7 +248,6 @@ export class VideoChatComponent implements OnInit {
 
   GetNewVideoElement() {
     const videoElement: HTMLVideoElement = this.renderer.createElement('video');
-    videoElement.muted = true;
     videoElement.autoplay = true;
     videoElement.setAttribute('playsinline', '');
     videoElement.addEventListener('contextmenu', function (event) {
@@ -273,5 +272,10 @@ export class VideoChatComponent implements OnInit {
     else {
       this.isMute = this.localUserStream.getAudioTracks()[0].enabled = true;
     }
+  }
+
+  endCall() {
+    this.signalRService.stopConnection();
+    this.router.navigate([`/create-room`]);
   }
 }

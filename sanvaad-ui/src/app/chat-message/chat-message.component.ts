@@ -1,6 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Message } from '@angular/compiler/src/i18n/i18n_ast';
-import { User } from '../dataModels/User';
+import { Message } from '../dataModels/Message';
 
 @Component({
   selector: 'app-chat-message',
@@ -10,8 +9,6 @@ import { User } from '../dataModels/User';
 export class ChatMessageComponent implements OnInit {
 
   @Input() msg: Message;
-
-  @Input() user: User;
 
   constructor() { }
 
