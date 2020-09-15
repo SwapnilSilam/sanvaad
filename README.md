@@ -26,7 +26,7 @@ Project Sanvaad is a Video Chat application and made using WebRTC and SignalR. T
 ## Trying to integrate
 1. Screen Sharing 
 
-## Intruction to run this project locally 
+## Instructions to run this project locally 
 1. Once cloned this project and open 'savaan-ui' in VSCode. 
 2. Type "npm install"
 3. Go to PeerJs Server GitHub page (https://github.com/peers/peerjs-server) and go through ReadMe file. Install PeerJs server locally and run local peer server on port 3001. 
