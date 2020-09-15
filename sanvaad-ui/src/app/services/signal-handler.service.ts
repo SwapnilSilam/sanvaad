@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as SignalR from '@microsoft/signalr'
+import { environment } from 'src/environments/environment';
 import { Message } from '../dataModels/Message';
 import { User } from '../dataModels/User';
 
@@ -24,7 +25,7 @@ export class SignalHandlerService {
     }
     else {
       this.hubConnection = new SignalR.HubConnectionBuilder()
-        .withUrl("https://localhost:5001/SanvaadConnection")
+        .withUrl(environment.signalRUrl)
         .build();
 
       this.hubConnection

@@ -8,6 +8,7 @@ import { Component, Renderer2, ElementRef, ViewChild, OnInit } from '@angular/co
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from "@angular/material";
 
+import { environment } from './../../environments/environment';
 import { SignalHandlerService } from '../services/signal-handler.service';
 import { PeerConnections } from '../dataModels/PeerConnections';
 import { GetUsernameDialogComponent } from '../get-username-dialog/get-username-dialog.component';
@@ -106,8 +107,9 @@ export class VideoChatComponent implements OnInit {
 
   getPeerObject(): any {
     return new Peer(undefined, {
-      host: "/",
-      port: 3001
+      path: environment.peerPath,
+      host: environment.peerHost,
+      port: environment.peerPort
     });
   }
 
