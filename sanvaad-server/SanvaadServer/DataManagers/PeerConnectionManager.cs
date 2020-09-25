@@ -41,18 +41,22 @@ namespace SanvaadServer.DataManagers
 
         public PeerConnection RemoveConnection(string connectionId)
         {
+            PeerConnection connection = null;
             List<PeerConnection> connections = Rooms.FirstOrDefault(x => x.Value.Where(y => y.ConnectionId == connectionId).Count() > 0).Value;
 
-            var connection = connections.Where(x => x.ConnectionId == connectionId).FirstOrDefault();
-
-            if (connection != null)
+            if (connections != null)
             {
-                connections.Remove(connection);
-            }
+                connection = connections.Where(x => x.ConnectionId == connectionId).FirstOrDefault();
 
-            if (connections.Count <= 0)
-            {
-                Rooms.Remove(connection.RoomId);
+                if (connection != null)
+                {
+                    connections.Remove(connection);
+                }
+
+                if (connections.Count <= 0)
+                {
+                    Rooms.Remove(connection.RoomId);
+                }
             }
 
             return connection;
@@ -75,5 +79,39 @@ namespace SanvaadServer.DataManagers
 
             return connection.User.DisplayName;
         }
+
+        public PeerConnection GetPeerConnection(string roomId, string userId)
+        {
+            var room = Rooms[roomId];
+
+            return room.FirstOrDefault(x => x.UserId == userId);
+        }
+
+        public void UpdatePeerConnection(string roomId, PeerConnection peerConnection)
+        {
+            var room = Rooms[roomId];
+
+            var oldPeerConnection = room.FirstOrDefault(x => x.UserId == peerConnection.UserId);
+
+            if (oldPeerConnection != null)
+            {
+                room.Remove(oldPeerConnection);
+                room.Add(peerConnection);
+            }
+        }
+
+        public List<string> GetRemoteUserIdsForScreenSharing(string roomId, string userId)
+        {
+            List<string> userIds = new List<string>();
+
+            var room = Rooms[roomId];
+            if (room != null)
+            {
+                userIds = room.Where(x => x.UserId != userId).Select(y => y.ScreenSharingId).ToList();
+            }
+
+            return userIds;
+        }
     }
 }
+

@@ -127,4 +127,32 @@ export class SignalHandlerService {
       .then(() => { console.log("Data broadcasted successfully!") })
       .catch(error => console.log(error))
   }
+
+  public invokeAddScreenSharingModality = (roomId: string, userId: string, screenSharingCallId: string) => {
+    this.hubConnection.invoke("AddScreenSharingModality", roomId, userId, screenSharingCallId)
+      .then(() => { console.log("Data broadcasted successfully!") })
+      .catch(error => console.log(error))
+  }
+
+  public listenScreenSharingStatus = (method: Function) => {
+    this.hubConnection.on("ScreenSharingStatus", (status: string, userName: string) => {
+      if (method !== null) {
+        method(status, userName);
+      }
+    })
+  }
+
+  public listenScreeenSharingStatusWithUserList = (method: Function) => {
+    this.hubConnection.on("ScreeenSharingStatusWithUserList", (userIds: string[], status: string) => {
+      if (method !== null) {
+        method(userIds, status);
+      }
+    })
+  }
+
+  public invokeScreenSharingStatus = (roomId: string, userId: string, status: string, userName: string) => {
+    this.hubConnection.invoke("ScreenSharingStatus", roomId, userId, status, userName)
+      .then(() => { console.log("Data broadcasted successfully!") })
+      .catch(error => console.log(error))
+  }
 }

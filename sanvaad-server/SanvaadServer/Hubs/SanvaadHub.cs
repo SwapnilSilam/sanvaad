@@ -26,7 +26,10 @@ namespace SanvaadServer.Hubs
         public override async Task OnDisconnectedAsync(Exception exception)
         {
             var peerConnection = _peerConnectionManager.RemoveConnection(Context.ConnectionId);
-            await Clients.GroupExcept(peerConnection.RoomId, new List<string>() { Context.ConnectionId }).LeftRoom(peerConnection.RoomId, peerConnection.UserId);
+            if (peerConnection != null)
+            {
+                await Clients.GroupExcept(peerConnection.RoomId, new List<string>() { Context.ConnectionId }).LeftRoom(peerConnection.RoomId, peerConnection.UserId);
+            }
         }
 
         public async Task SendMessageToAll(string roomId, Message message)
@@ -54,6 +57,22 @@ namespace SanvaadServer.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
             await Clients.GroupExcept(roomId, new List<string>() { Context.ConnectionId }).JoinedRoom(roomId, userId, displayName);
             await Clients.Client(Context.ConnectionId).GetSelfDetails(user);
+        }
+
+        public void AddScreenSharingModality(string roomId, string userId, string screenSharingCallId)
+        {
+            var peerConnection = _peerConnectionManager.GetPeerConnection(roomId, userId);
+            peerConnection.ScreenSharingId = screenSharingCallId;
+            _peerConnectionManager.UpdatePeerConnection(roomId, peerConnection);
+        }
+
+        public async Task ScreenSharingStatus(string roomId, string userId, string status, string userName)
+        {
+            var listOfUserIds = _peerConnectionManager.GetRemoteUserIdsForScreenSharing(roomId, userId);
+
+            await Clients.GroupExcept(roomId, new List<string>() { Context.ConnectionId }).ScreenSharingStatus(status, userName);
+
+            await Clients.Client(Context.ConnectionId).ScreeenSharingStatusWithUserList(listOfUserIds, status);
         }
 
         public async Task LeftRoom()

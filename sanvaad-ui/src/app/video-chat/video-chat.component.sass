@@ -1,18 +1,35 @@
-video
+.mainContainer
+  height: 100%
+
+.videoDisplay
   -webkit-transform: scaleX(-1)
   transform: scaleX(-1)
   object-fit: cover
-  padding: 8px
+  min-height: 10%
+  min-width: 10%
+  max-width: 100%
+  margin: 5px
+  position: relative
 
-#video-container
+.screenSharingDisplay
+  width: 100%
+  height: 100%
+
+.videoContainer
   float: left
-  overflow-x: scroll
-  overflow-y: scroll
+  overflow-x: auto
+  overflow-y: auto
   flex-direction: row
   margin: 0
   padding: 0
-  width: 100vw
-  height: 100vh
+  width: 100%
+  height: 100%
+  justify-content: center
+  align-items: center
+
+.screenSharingContainer
+  float: left
+  flex-direction: row
   display: flex
   justify-content: center
   align-items: center
@@ -21,9 +38,13 @@ video
   display: flex
   flex-direction: column-reverse
   font-weight: bold
+  position: relative
 
 .displayName
-  padding: 0px 8px 0px 8px
+  padding: 10px
+  color: white
+  position: absolute
+  z-index: 1
 
 .video-control
   margin: 5px
@@ -56,11 +77,13 @@ video
   opacity: .96
   position: fixed
   text-align: center
-  // transform: translateY(100px)
+  transform: translateY(35px)
   transition: opacity 250ms cubic-bezier(0.4,0.0,1,1),transform 250ms cubic-bezier(0.4,0.0,1,1)
   white-space: nowrap
   width: 100vw
   z-index: 3
+  &:hover
+    transform: translateY(0px)
 
 .meetingDetails
   box-pack: start
