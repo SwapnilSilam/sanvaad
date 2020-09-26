@@ -35,6 +35,7 @@ export class VideoChatComponent implements OnInit {
   public isScreenSharingByRemote: boolean = false;
   public isScreenSharingEnabled: boolean = false;
   public userDisplayName: string;
+  public screenSharinUserName: string;
 
   // Local user peer object
   private localUserPeer: any;
@@ -49,7 +50,7 @@ export class VideoChatComponent implements OnInit {
   public avContraints: any = { audio: true, video: { width: { exact: 640 }, height: { exact: 480 } } };
 
   // In memory data containers
-  private connections: Array<PeerConnections> = new Array();
+  public connections: Array<PeerConnections> = new Array();
   private remoteConnectionIds: Array<string> = new Array();
 
   constructor(private renderer: Renderer2, private changeDetector: ChangeDetectorRef, private route: ActivatedRoute, private router: Router, private dialog: MatDialog, public signalRService: SignalHandlerService) { }
@@ -339,7 +340,7 @@ export class VideoChatComponent implements OnInit {
     this.sendOtherToScreenClosed();
   }
 
-  sendOtherToScreenClosed(){
+  sendOtherToScreenClosed() {
     this.isScreenSharingByMe = false;
     this.isScreenSharingEnabled = false;
     this.isScreenSharingByRemote = false;
@@ -388,13 +389,17 @@ export class VideoChatComponent implements OnInit {
     this.addScreenSharing(stream);
   }
 
-  onScreenSharingStatus(status: string) {
+  onScreenSharingStatus(status: string, remoteUserName: string) {
     console.log(`Inside onScreenSharingStatus with status -> ${status}`);
     if (status == ScreeenSharingStatus.Stopped) {
       this.isScreenSharingByRemote = false;
       this.isScreenSharingEnabled = false;
       this.isScreenSharingByMe = false;
+      this.screenSharinUserName = "";
       this.stoppedSharingScreen();
+    }
+    if(status == ScreeenSharingStatus.Started){
+      this.screenSharinUserName = remoteUserName;
     }
   }
 
@@ -406,6 +411,7 @@ export class VideoChatComponent implements OnInit {
           console.log("Inside onScreeenSharingStatusWithUserList calling other users.");
           console.log(`Local user screen sharing Id : ${this.localUserScreenSharingId} == ${this.localUserScreenSharingPeer.id} calling to remote user id : ${element}`);
           this.localUserScreenSharingPeer.call(element, this.localUserScreenSharingStream);
+          this.screenSharinUserName = "You";
         }
       });
     }
@@ -413,6 +419,7 @@ export class VideoChatComponent implements OnInit {
       this.isScreenSharingByRemote = false;
       this.isScreenSharingEnabled = false;
       this.isScreenSharingByMe = false;
+      this.screenSharinUserName = "";
     }
   }
 }

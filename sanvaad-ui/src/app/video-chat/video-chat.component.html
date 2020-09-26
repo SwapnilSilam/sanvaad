@@ -11,8 +11,7 @@
         <!-- Screen sharing Container -->
         <div class="h-100  py-2 d-flex align-items-center justify-content-center fixed-top"
           [ngClass]="{'col-sm-0':isScreenSharingEnabled === false, 'col-sm-10':isScreenSharingEnabled === true }"
-          style="background-color: black; z-index: 0;"
-          id="left">
+          style="background-color: black; z-index: 0;" id="left">
 
           <div id="screenSharing-container" class="screenSharingContainer">
             <div *ngIf="isScreenSharingByRemote" style="border-style: solid; background-color: black;">
@@ -30,7 +29,7 @@
         <div class="py-2 align-items-center justify-content-center"
           [ngClass]="{'col-sm-12 ':isScreenSharingEnabled === false, 'col-sm-2 offset-sm-10':isScreenSharingEnabled === true }">
           <div id="video-container" class="videoContainer" #videoContainer style="background-color: black;"
-          [ngStyle]="{'display':isScreenSharingEnabled === false ? 'flex' : 'grid' }">
+            [ngStyle]="{'display':isScreenSharingEnabled === false ? 'flex' : 'grid' }">
           </div>
         </div>
       </div>
@@ -43,11 +42,11 @@
   <div class="meetingDetails">
     <button class="video-control" mat-raised-button color="primary" matTooltip="Meeting details"
       (click)="openMeetingDetailsDialog($event)">
-      Meeting Details
+        <span>Meeting Details</span>
     </button>
     <button class="video-control" mat-raised-button color="primary" matTooltip="List of Participants"
       (click)="openGetPaticipantListDialog($event)">
-      Participants
+        <span>Participants</span>
     </button>
   </div>
   <div class="meetingControls">
@@ -68,9 +67,10 @@
     </button>
   </div>
   <div class="screenSharingControls">
-    <button class="video-control" mat-raised-button color="primary" matTooltip="Screen sharing"
-      (click)="startShareScreen()">
-      Screen Sharing
+    <button class="video-control" mat-raised-button color="primary" matTooltip="Present Screen"
+      (click)="startShareScreen()" [disabled]="isScreenSharingEnabled || connections.length <= 1">
+        <span [hidden]="!isScreenSharingEnabled" style="word-wrap: break-word;">{{ screenSharinUserName }} Presenting Screen</span>
+        <span [hidden]="isScreenSharingEnabled">Present Screen</span>
     </button>
   </div>
 </div>
