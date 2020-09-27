@@ -22,9 +22,7 @@ Project Sanvaad is a Video Chat application and made using WebRTC and SignalR. T
 1. Video call 
 2. Audio call 
 3. Chat 
-
-## Trying to integrate
-1. Screen Sharing 
+4. Screen Sharing 
 
 ## Intruction to run this project locally 
 1. Once cloned this project and open 'savaan-ui' in VSCode. 
