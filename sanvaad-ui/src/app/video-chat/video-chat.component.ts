@@ -125,10 +125,10 @@ export class VideoChatComponent implements OnInit {
   }
 
   getPeerObject(): any {
-    console.log(environment);
     return new Peer(undefined, {
-      host: "/",
-      port: 3001
+      path: environment.peerPath,
+      host: environment.peerHost,
+      port: environment.peerPort
     });
   }
 
@@ -302,7 +302,6 @@ export class VideoChatComponent implements OnInit {
   }
 
   addScreenSharing(stream: MediaStream) {
-    console.log("Inside addScreenSharing");
     const videoElement = document.getElementById("screenSharingObj") as HTMLVideoElement;
     videoElement.muted = false;
     videoElement.srcObject = stream;
@@ -310,7 +309,6 @@ export class VideoChatComponent implements OnInit {
 
   async startShareScreen() {
     try {
-      console.log("Inside startShareScreen");
       const mediaDevices = navigator.mediaDevices as any;
       const stream = await mediaDevices.getDisplayMedia(this.displayMediaOptions);
       this.localUserScreenSharingStream = stream;
@@ -323,8 +321,6 @@ export class VideoChatComponent implements OnInit {
         this.sendOtherToScreenClosed();
       };
 
-      console.log("Inside startShareScreen invokeScreenSharingStatus");
-
       this.signalRService.invokeScreenSharingStatus(this.meetingId, this.localUserId, ScreeenSharingStatus.Started, this.userDisplayName);
 
     }
@@ -334,7 +330,6 @@ export class VideoChatComponent implements OnInit {
   }
 
   stopSharingScreen() {
-    console.log("Inside stopSharingScreen");
     const tracks = this.localUserScreenSharingStream.getTracks();
     tracks.forEach(track => track.stop());
     this.sendOtherToScreenClosed();
@@ -348,7 +343,6 @@ export class VideoChatComponent implements OnInit {
   }
 
   stoppedSharingScreen() {
-    console.log("Inside stoppedSharingScreen");
     const videoElement = document.getElementById("screenSharingObj") as HTMLVideoElement;
     const stream = videoElement.srcObject as MediaStream;
     const tracks = stream.getTracks();
@@ -358,27 +352,22 @@ export class VideoChatComponent implements OnInit {
   }
 
   createScreenSharingPeerObject() {
-    console.log("Inside createScreenSharingPeerObject");
     this.localUserScreenSharingPeer = this.getPeerObject();
     this.localUserScreenSharingPeer.on('open', this.sendNotificationOfAddSharingModality.bind(this));
     this.localUserScreenSharingPeer.on('call', this.onScreenShareCallReceive.bind(this));
   }
 
   sendNotificationOfAddSharingModality(screenSharingCallId: any) {
-    console.log("Inside sendNotificationOfAddSharingModality and invokeAddScreenSharingModality");
-    console.log(`Local user screen sharing Id : ${screenSharingCallId}`);
     this.localUserScreenSharingId = screenSharingCallId;
     this.signalRService.invokeAddScreenSharingModality(this.meetingId, this.localUserId, screenSharingCallId);
   }
 
   async onScreenShareCallReceive(call: any) {
-    console.log("Inside onScreenShareCallReceive");
     call.answer(null);
     call.on('stream', ((stream: any) => this.onScreenShareStream(stream, call)).bind(this));
   }
 
   onScreenShareStream(stream: any, call: any) {
-    console.log("Inside onScreenShareStream");
     this.isScreenSharingByRemote = true;
     this.isScreenSharingEnabled = true;
     this.isScreenSharingByMe = false;
@@ -390,7 +379,6 @@ export class VideoChatComponent implements OnInit {
   }
 
   onScreenSharingStatus(status: string, remoteUserName: string) {
-    console.log(`Inside onScreenSharingStatus with status -> ${status}`);
     if (status == ScreeenSharingStatus.Stopped) {
       this.isScreenSharingByRemote = false;
       this.isScreenSharingEnabled = false;
@@ -404,12 +392,9 @@ export class VideoChatComponent implements OnInit {
   }
 
   onScreeenSharingStatusWithUserList(userIds: string[], status: string) {
-    console.log("Inside onScreeenSharingStatusWithUserList");
     if (userIds.length > 0 && status == ScreeenSharingStatus.Started) {
       userIds.forEach(element => {
         if (element != this.localUserId) {
-          console.log("Inside onScreeenSharingStatusWithUserList calling other users.");
-          console.log(`Local user screen sharing Id : ${this.localUserScreenSharingId} == ${this.localUserScreenSharingPeer.id} calling to remote user id : ${element}`);
           this.localUserScreenSharingPeer.call(element, this.localUserScreenSharingStream);
           this.screenSharinUserName = "You";
         }

@@ -54,6 +54,9 @@ export class SignalHandlerService {
     this.hubConnection.on("ReceiveMessage", (data: Message) => {
       if (method !== null) {
         method(data);
+        console.log("Message received and method executed.", data);
+      } else {
+        console.log("Message received and method not executed.", data);
       }
     })
   };
@@ -90,13 +93,16 @@ export class SignalHandlerService {
     this.hubConnection.on("GetSelfDetails", (user: User) => {
       if (method !== null) {
         method(user);
+        console.log("Received get self details and method executed.", user);
+      } else {
+        console.log("Received get self details and method not executed.", user);
       }
     })
   }
 
   public invokeGetSelfDetails = () => {
     this.hubConnection.invoke("GetSelfDetails")
-      .then(() => { console.log("Data broadcasted successfully!") })
+      .then(() => { console.log("Trying to get self details successfully!") })
       .catch(error => console.log(error))
   }
 
