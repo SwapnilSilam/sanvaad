@@ -13,5 +13,8 @@ namespace SanvaadServer.Hubs
         Task GetSelfDetails(User user);
         Task GetRemoteUser(string userName, string userId);
         Task PaticipantsList(List<User> users);
+        Task AddScreenSharingModality(string userId, string screenSharingCallId);
+        Task ScreenSharingStatus(string status, string userName);
+        Task ScreeenSharingStatusWithUserList(List<string> userIds, string status);
     }
 }

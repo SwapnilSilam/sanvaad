@@ -5,20 +5,48 @@
     </div>
   </mat-drawer>
   <mat-drawer-content>
-    <form style="height: 100%;">
-      <div id="video-container" #videoContainer>
+
+    <div class="container-fluid h-100">
+      <div class="row h-100">
+        <!-- Screen sharing Container -->
+        <div class="h-100  py-2 d-flex align-items-center justify-content-center fixed-top"
+          [ngClass]="{'col-sm-0':isScreenSharingEnabled === false, 'col-sm-10':isScreenSharingEnabled === true }"
+          style="background-color: black; z-index: 0;" id="left">
+
+          <div id="screenSharing-container" class="screenSharingContainer">
+            <div *ngIf="isScreenSharingByRemote" style="border-style: solid; background-color: black;">
+              <video id="screenSharingObj" (contextmenu)="false" autoplay playsinline
+                class="screenSharingDisplay h-100"></video>
+            </div>
+            <button class="video-control" mat-raised-button color="primary" matTooltip="Screen sharing"
+              (click)="stopSharingScreen()" *ngIf="isScreenSharingByMe">
+              Stop Screen Sharing
+            </button>
+          </div>
+
+        </div>
+        <!-- Video Container -->
+        <div class="py-2 align-items-center justify-content-center"
+          [ngClass]="{'col-sm-12 ':isScreenSharingEnabled === false, 'col-sm-2 offset-sm-10':isScreenSharingEnabled === true }">
+          <div id="video-container" class="videoContainer" #videoContainer style="background-color: black;"
+            [ngStyle]="{'display':isScreenSharingEnabled === false ? 'flex' : 'grid' }">
+          </div>
+        </div>
       </div>
-      <div id="errorMsg"></div>
-    </form>
+    </div>
+
+
   </mat-drawer-content>
 </mat-drawer-container>
 <div class="controlPanel" id="video-controls-container">
   <div class="meetingDetails">
-    <button class="video-control" mat-raised-button color="primary" matTooltip="Meeting details" (click)="openMeetingDetailsDialog($event)">
-      Meeting Details
+    <button class="video-control" mat-raised-button color="primary" matTooltip="Meeting details"
+      (click)="openMeetingDetailsDialog($event)">
+        <span>Meeting Details</span>
     </button>
-    <button class="video-control" mat-raised-button color="primary" matTooltip="List of Participants" (click)="openGetPaticipantListDialog($event)">
-      Participants
+    <button class="video-control" mat-raised-button color="primary" matTooltip="List of Participants"
+      (click)="openGetPaticipantListDialog($event)">
+        <span>Participants</span>
     </button>
   </div>
   <div class="meetingControls">
@@ -39,8 +67,10 @@
     </button>
   </div>
   <div class="screenSharingControls">
-    <button class="video-control" mat-raised-button color="primary" matTooltip="Screen sharing">
-      Screen Sharing
+    <button class="video-control" mat-raised-button color="primary" matTooltip="Present Screen"
+      (click)="startShareScreen()" [disabled]="isScreenSharingEnabled || connections.length <= 1">
+        <span [hidden]="!isScreenSharingEnabled" style="word-wrap: break-word;">{{ screenSharinUserName }} Presenting Screen</span>
+        <span [hidden]="isScreenSharingEnabled">Present Screen</span>
     </button>
   </div>
 </div>

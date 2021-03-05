@@ -54,6 +54,9 @@ export class SignalHandlerService {
     this.hubConnection.on("ReceiveMessage", (data: Message) => {
       if (method !== null) {
         method(data);
+        console.log("Message received and method executed.", data);
+      } else {
+        console.log("Message received and method not executed.", data);
       }
     })
   };
@@ -90,13 +93,16 @@ export class SignalHandlerService {
     this.hubConnection.on("GetSelfDetails", (user: User) => {
       if (method !== null) {
         method(user);
+        console.log("Received get self details and method executed.", user);
+      } else {
+        console.log("Received get self details and method not executed.", user);
       }
     })
   }
 
   public invokeGetSelfDetails = () => {
     this.hubConnection.invoke("GetSelfDetails")
-      .then(() => { console.log("Data broadcasted successfully!") })
+      .then(() => { console.log("Trying to get self details successfully!") })
       .catch(error => console.log(error))
   }
 
@@ -124,6 +130,34 @@ export class SignalHandlerService {
 
   public invokeGetPaticipantsList = (roomId: string) => {
     this.hubConnection.invoke("PaticipantsList", roomId)
+      .then(() => { console.log("Data broadcasted successfully!") })
+      .catch(error => console.log(error))
+  }
+
+  public invokeAddScreenSharingModality = (roomId: string, userId: string, screenSharingCallId: string) => {
+    this.hubConnection.invoke("AddScreenSharingModality", roomId, userId, screenSharingCallId)
+      .then(() => { console.log("Data broadcasted successfully!") })
+      .catch(error => console.log(error))
+  }
+
+  public listenScreenSharingStatus = (method: Function) => {
+    this.hubConnection.on("ScreenSharingStatus", (status: string, userName: string) => {
+      if (method !== null) {
+        method(status, userName);
+      }
+    })
+  }
+
+  public listenScreeenSharingStatusWithUserList = (method: Function) => {
+    this.hubConnection.on("ScreeenSharingStatusWithUserList", (userIds: string[], status: string) => {
+      if (method !== null) {
+        method(userIds, status);
+      }
+    })
+  }
+
+  public invokeScreenSharingStatus = (roomId: string, userId: string, status: string, userName: string) => {
+    this.hubConnection.invoke("ScreenSharingStatus", roomId, userId, status, userName)
       .then(() => { console.log("Data broadcasted successfully!") })
       .catch(error => console.log(error))
   }

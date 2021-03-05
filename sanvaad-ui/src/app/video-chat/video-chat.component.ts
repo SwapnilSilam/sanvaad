@@ -4,7 +4,7 @@
 // PS> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 // Or PS> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine
 
-import { Component, Renderer2, ElementRef, ViewChild, OnInit } from '@angular/core';
+import { Component, Renderer2, ElementRef, ViewChild, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from "@angular/material";
 
@@ -14,6 +14,7 @@ import { PeerConnections } from '../dataModels/PeerConnections';
 import { GetUsernameDialogComponent } from '../get-username-dialog/get-username-dialog.component';
 import { ShowParticipantsDialogComponent } from '../show-participants-dialog/show-participants-dialog.component';
 import { MeetingDetailsDialogComponent } from '../meeting-details-dialog/meeting-details-dialog.component';
+import { ScreeenSharingStatus } from '../dataModels/ScreeenSharingStatus';
 
 declare var Peer: any;
 
@@ -25,18 +26,34 @@ declare var Peer: any;
 export class VideoChatComponent implements OnInit {
 
   private meetingId: string;
-  private localUserPeer: any;
   private localUserId: string;
-  public localUserStream: MediaStream;
+  private localUserScreenSharingId: string;
   public localUserCallObject: any;
   public isVideoEnabled: boolean = false;
   public isMute: boolean = false;
-  public remoteUserCall: any;
+  public isScreenSharingByMe: boolean = false;
+  public isScreenSharingByRemote: boolean = false;
+  public isScreenSharingEnabled: boolean = false;
   public userDisplayName: string;
+  public screenSharinUserName: string;
+
+  // Local user peer object
+  private localUserPeer: any;
+  private localUserScreenSharingPeer: any;
+
+  // Local user Video and Screen streams
+  public localUserStream: MediaStream;
+  public localUserScreenSharingStream: MediaStream;
+
+  // Device selection constraints
+  private displayMediaOptions: any = { video: { cursor: "always" }, audio: false };
   public avContraints: any = { audio: true, video: { width: { exact: 640 }, height: { exact: 480 } } };
-  private connections: Array<PeerConnections> = new Array();
+
+  // In memory data containers
+  public connections: Array<PeerConnections> = new Array();
   private remoteConnectionIds: Array<string> = new Array();
-  constructor(private renderer: Renderer2, private route: ActivatedRoute, private router: Router, private dialog: MatDialog, public signalRService: SignalHandlerService) { }
+
+  constructor(private renderer: Renderer2, private changeDetector: ChangeDetectorRef, private route: ActivatedRoute, private router: Router, private dialog: MatDialog, public signalRService: SignalHandlerService) { }
 
   @ViewChild('videoContainer', { static: false }) videoContainer: ElementRef;
 
@@ -96,6 +113,8 @@ export class VideoChatComponent implements OnInit {
     this.signalRService.listenJoinedRoom(this.connectToOtherUsers.bind(this));
     this.signalRService.listenUserLeftRoom(this.remoteUserLeft.bind(this));
     this.signalRService.listenGetRemoteUserDetails(this.onRemoteUserDetails.bind(this));
+    this.signalRService.listenScreenSharingStatus(this.onScreenSharingStatus.bind(this));
+    this.signalRService.listenScreeenSharingStatusWithUserList(this.onScreeenSharingStatusWithUserList.bind(this));
   }
 
   async onSuccessfullConnection() {
@@ -116,11 +135,11 @@ export class VideoChatComponent implements OnInit {
   sendNotificationOfJoining(id: any) {
     this.localUserId = id;
     this.signalRService.invokeJoinedRoom(this.meetingId, id, this.userDisplayName);
+    this.createScreenSharingPeerObject();
   }
 
   async onCallReceive(call: any) {
     const stream = await navigator.mediaDevices.getUserMedia(this.avContraints);
-    this.remoteUserCall = call;
 
     this.localUserStream = stream;
     const peerConnection = this.connections.filter(item => item.UserId == this.localUserId);
@@ -219,7 +238,7 @@ export class VideoChatComponent implements OnInit {
     }
   }
 
-  addUser(stream: MediaStream, userId: string, callObject: any, userName: string, isLocalPaticipant : boolean) {
+  addUser(stream: MediaStream, userId: string, callObject: any, userName: string, isLocalPaticipant: boolean) {
     const videoElement = this.GetNewVideoElement();
     videoElement.muted = isLocalPaticipant;
     videoElement.srcObject = stream;
@@ -252,6 +271,7 @@ export class VideoChatComponent implements OnInit {
     const videoElement: HTMLVideoElement = this.renderer.createElement('video');
     videoElement.autoplay = true;
     videoElement.setAttribute('playsinline', '');
+    videoElement.setAttribute('class', 'videoDisplay');
     videoElement.addEventListener('contextmenu', function (event) {
       event.preventDefault();
     });
@@ -279,5 +299,112 @@ export class VideoChatComponent implements OnInit {
   endCall() {
     this.signalRService.stopConnection();
     this.router.navigate([`/create-room`]);
+  }
+
+  addScreenSharing(stream: MediaStream) {
+    const videoElement = document.getElementById("screenSharingObj") as HTMLVideoElement;
+    videoElement.muted = false;
+    videoElement.srcObject = stream;
+  }
+
+  async startShareScreen() {
+    try {
+      const mediaDevices = navigator.mediaDevices as any;
+      const stream = await mediaDevices.getDisplayMedia(this.displayMediaOptions);
+      this.localUserScreenSharingStream = stream;
+
+      this.isScreenSharingByMe = true;
+      this.isScreenSharingEnabled = true;
+      this.isScreenSharingByRemote = false;
+
+      this.localUserScreenSharingStream.getVideoTracks()[0].onended = (event) => {
+        this.sendOtherToScreenClosed();
+      };
+
+      this.signalRService.invokeScreenSharingStatus(this.meetingId, this.localUserId, ScreeenSharingStatus.Started, this.userDisplayName);
+
+    }
+    catch (exception) {
+      this.HandelError(exception);
+    }
+  }
+
+  stopSharingScreen() {
+    const tracks = this.localUserScreenSharingStream.getTracks();
+    tracks.forEach(track => track.stop());
+    this.sendOtherToScreenClosed();
+  }
+
+  sendOtherToScreenClosed() {
+    this.isScreenSharingByMe = false;
+    this.isScreenSharingEnabled = false;
+    this.isScreenSharingByRemote = false;
+    this.signalRService.invokeScreenSharingStatus(this.meetingId, this.localUserId, ScreeenSharingStatus.Stopped, this.userDisplayName);
+  }
+
+  stoppedSharingScreen() {
+    const videoElement = document.getElementById("screenSharingObj") as HTMLVideoElement;
+    const stream = videoElement.srcObject as MediaStream;
+    const tracks = stream.getTracks();
+
+    tracks.forEach(track => track.stop());
+    videoElement.srcObject = null;
+  }
+
+  createScreenSharingPeerObject() {
+    this.localUserScreenSharingPeer = this.getPeerObject();
+    this.localUserScreenSharingPeer.on('open', this.sendNotificationOfAddSharingModality.bind(this));
+    this.localUserScreenSharingPeer.on('call', this.onScreenShareCallReceive.bind(this));
+  }
+
+  sendNotificationOfAddSharingModality(screenSharingCallId: any) {
+    this.localUserScreenSharingId = screenSharingCallId;
+    this.signalRService.invokeAddScreenSharingModality(this.meetingId, this.localUserId, screenSharingCallId);
+  }
+
+  async onScreenShareCallReceive(call: any) {
+    call.answer(null);
+    call.on('stream', ((stream: any) => this.onScreenShareStream(stream, call)).bind(this));
+  }
+
+  onScreenShareStream(stream: any, call: any) {
+    this.isScreenSharingByRemote = true;
+    this.isScreenSharingEnabled = true;
+    this.isScreenSharingByMe = false;
+
+    this.changeDetector.detectChanges();
+    this.changeDetector.markForCheck();
+
+    this.addScreenSharing(stream);
+  }
+
+  onScreenSharingStatus(status: string, remoteUserName: string) {
+    if (status == ScreeenSharingStatus.Stopped) {
+      this.isScreenSharingByRemote = false;
+      this.isScreenSharingEnabled = false;
+      this.isScreenSharingByMe = false;
+      this.screenSharinUserName = "";
+      this.stoppedSharingScreen();
+    }
+    if(status == ScreeenSharingStatus.Started){
+      this.screenSharinUserName = remoteUserName;
+    }
+  }
+
+  onScreeenSharingStatusWithUserList(userIds: string[], status: string) {
+    if (userIds.length > 0 && status == ScreeenSharingStatus.Started) {
+      userIds.forEach(element => {
+        if (element != this.localUserId) {
+          this.localUserScreenSharingPeer.call(element, this.localUserScreenSharingStream);
+          this.screenSharinUserName = "You";
+        }
+      });
+    }
+    else {
+      this.isScreenSharingByRemote = false;
+      this.isScreenSharingEnabled = false;
+      this.isScreenSharingByMe = false;
+      this.screenSharinUserName = "";
+    }
   }
 }
